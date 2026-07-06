@@ -10,10 +10,10 @@ and battery information, all from one tray app.
 
 ## Features
 
-- **LEDs** — turn the power, red dot, microphone-mute, sleep (moon), and Fn-lock LEDs on, off, or into their blink state.
-- **CPU fan** — switch between firmware **Auto** and **Full** speed.
-- **Keyboard backlight** — Off / Low / High, with options to remember the level across sleep/restart and to dim it when apps go full screen.
-- **System status** — live CPU temperature (color coded), fan RPM, and battery charge / health / cycle count.
+- **LEDs**: turn the power, red dot, microphone-mute, and sleep (moon) LEDs on, off, or into their blink state.
+- **CPU fan**: switch between firmware **Auto** and **Full** speed.
+- **Keyboard backlight**: Off / Low / High, with options to remember the level across sleep/restart and to dim it when apps go full screen.
+- **System status**: live CPU temperature (color coded), fan RPM, and battery charge / health / cycle count.
 - Lives in the system tray; optional start at Windows logon.
 
 ## Requirements
@@ -31,9 +31,9 @@ self-contained, so no separate .NET runtime is required.
 
 The app talks to the embedded controller through a low-level driver:
 
-- **WinRing0** (default) — works out of the box, but is **blocked by Windows 11 when Memory
+- **WinRing0** (default): works out of the box, but is **blocked by Windows 11 when Memory
   Integrity / Core Isolation is enabled**.
-- **PawnIO** — a modern, signed driver that works with Memory Integrity on. The installer
+- **PawnIO**: a modern, signed driver that works with Memory Integrity on. The installer
   offers to install it (and ticks that option automatically when it detects Memory Integrity).
   You can also get it from [pawnio.eu](https://pawnio.eu). After installing, hold **Shift**
   while launching the app and pick the PawnIO driver.
