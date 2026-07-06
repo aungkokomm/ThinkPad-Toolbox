@@ -4,6 +4,13 @@ A small, modern Windows utility for ThinkPad laptops. It lets you control the st
 LEDs, the CPU fan, and the keyboard backlight, and shows live CPU temperature, fan RPM,
 and battery information, all from one tray app.
 
+<p align="center">
+  <a href="https://github.com/aungkokomm/ThinkPad-Toolbox/releases/latest"><img alt="Download" src="https://img.shields.io/badge/Download-Latest%20Release-2F6FED?style=for-the-badge"></a>
+  <a href="https://github.com/aungkokomm/ThinkPad-Toolbox/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/aungkokomm/ThinkPad-Toolbox/total?style=for-the-badge&label=Downloads&color=8A3FFC"></a>
+  <img alt="Platform" src="https://img.shields.io/badge/Windows%2010%2F11-x64-555?style=for-the-badge">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-1FA855?style=for-the-badge">
+</p>
+
 > Not affiliated with, endorsed by, or sponsored by Lenovo. An independent, free tool.
 > "Lenovo" and "ThinkPad" are trademarks of Lenovo.
 <img width="419" height="485" alt="image" src="https://github.com/user-attachments/assets/51e27529-045f-4ca9-846f-8a84de5e5f2c" />
