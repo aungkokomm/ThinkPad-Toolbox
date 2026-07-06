@@ -40,15 +40,16 @@ namespace LEDControl
         #endregion
 
         #region EC_access_methods
-        bool waitportstatus(int bits, bool onoff = false, int timeout = 1000)
+        bool waitportstatus(int bits, bool onoff = false, int timeout = 100)
         {
             ushort port = EC_CTRLPORT;
-            int time = 0;
-            int tick = 10;
+            int tick = 5;
             //
-            // wait until input on control port has desired state or times out
+            // Wait until the control port reaches the desired state, or time out.
+            // Returning false on timeout is important: it means the EC is busy (Windows
+            // is likely mid-transaction), so the caller aborts rather than colliding.
             //
-            for (time = 0; time < timeout; time += tick)
+            for (int time = 0; time < timeout; time += tick)
             {
                 byte data = 0;
                 try
@@ -65,19 +66,15 @@ namespace LEDControl
                     return false;
                 }
 
-                // check for desired result
                 bool flagstate = (((char)data) & bits) != 0,
                     wantedstate = onoff != false;
 
                 if (flagstate == wantedstate)
-                {
-                    break;
-                }
+                    return true;
 
-                // try again after a moment
                 System.Threading.Thread.Sleep(tick);
             }
-            return true;
+            return false;   // timed out: EC did not become ready
         }
 
         bool writeport(ushort port, byte data)
@@ -123,9 +120,33 @@ namespace LEDControl
         // handshake is a multi-step transaction that must not interleave between
         // the UI thread (button clicks) and the background keyboard-backlight worker.
         readonly object ecLock = new object();
+
+        // Windows and other EC tools (e.g. TPFanControl) coordinate access to the embedded
+        // controller through this shared named mutex, so they take turns instead of
+        // corrupting each other's (and the OS's battery/thermal) transactions.
+        static readonly System.Threading.Mutex ecMutex = OpenEcMutex();
+        static System.Threading.Mutex OpenEcMutex()
+        {
+            try { return new System.Threading.Mutex(false, "Global\\Access_EC"); }
+            catch { try { return new System.Threading.Mutex(false, "Access_EC"); } catch { return null; } }
+        }
+        static bool EcAcquire()
+        {
+            if (ecMutex == null) return false;
+            try { return ecMutex.WaitOne(200); }
+            catch (System.Threading.AbandonedMutexException) { return true; } // previous owner died; we hold it now
+            catch { return false; }
+        }
+        static void EcRelease(bool held)
+        {
+            if (held && ecMutex != null) { try { ecMutex.ReleaseMutex(); } catch { } }
+        }
+
         bool ReadByteFromEC(byte offset, ref byte pdata)
         {
-            lock (ecLock) { return ReadByteFromECInner(offset, ref pdata); }
+            bool held = EcAcquire();
+            try { lock (ecLock) { return ReadByteFromECInner(offset, ref pdata); } }
+            finally { EcRelease(held); }
         }
         bool ReadByteFromECInner(byte offset, ref byte pdata)
         {
@@ -174,7 +195,9 @@ namespace LEDControl
 
         bool WriteByteToEC(byte offset, byte data)
         {
-            lock (ecLock) { return WriteByteToECInner(offset, data); }
+            bool held = EcAcquire();
+            try { lock (ecLock) { return WriteByteToECInner(offset, data); } }
+            finally { EcRelease(held); }
         }
         bool WriteByteToECInner(byte offset, byte data)
         {
@@ -364,6 +387,15 @@ namespace LEDControl
         {
             base.OnSizeChanged(e);
             if (this.WindowState == FormWindowState.Minimized) this.Hide();
+        }
+
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+            // Only read the EC for temperature / fan RPM while the window is actually on
+            // screen. When it lives in the tray, stop polling to keep EC traffic (and any
+            // chance of colliding with Windows' battery/thermal management) to a minimum.
+            if (statusTimer != null) statusTimer.Enabled = this.Visible;
         }
 
         Ols ols;
@@ -1014,14 +1046,15 @@ namespace LEDControl
             // never freezes while waiting on the embedded controller.
             if (System.Threading.Interlocked.CompareExchange(ref backlightBusy, 1, 0) != 0) return;
             bool turnOff = checkTurnKBLightOff.Checked;
+            bool remember = rememberKBD.Checked;
             System.Threading.Tasks.Task.Run(() =>
             {
-                try { BacklightWork(turnOff); }
+                try { BacklightWork(turnOff, remember); }
                 catch { }
                 finally { System.Threading.Interlocked.Exchange(ref backlightBusy, 0); }
             });
         }
-        private void BacklightWork(bool turnOff)
+        private void BacklightWork(bool turnOff, bool remember)
         {
             // This feature dims ONLY the keyboard backlight while a full-screen app is in
             // front. It deliberately does not touch the power/mic/Fn LEDs (the original did,
@@ -1037,7 +1070,10 @@ namespace LEDControl
                     full = true;
                 }
             }
-            if (PowerManager.IsMonitorOn && (!turnOff || !full) && !isLidClosed)
+            // Only sample the keyboard level (an EC read) when the "remember level" feature
+            // is actually on. When just the full-screen dimmer is enabled, this avoids a
+            // continuous once-per-second EC read while nothing needs it.
+            if (remember && PowerManager.IsMonitorOn && (!turnOff || !full) && !isLidClosed)
             {
                 RecordLevel(GetKeyboardLightlevel());
             }
