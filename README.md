@@ -6,7 +6,8 @@ and battery information, all from one tray app.
 
 > Not affiliated with, endorsed by, or sponsored by Lenovo. An independent, free tool.
 > "Lenovo" and "ThinkPad" are trademarks of Lenovo.
-<img width="457" height="473" alt="image" src="https://github.com/user-attachments/assets/732cfdcb-ff92-4ecc-b189-4130c1f74ee4" />
+<img width="419" height="485" alt="image" src="https://github.com/user-attachments/assets/51e27529-045f-4ca9-846f-8a84de5e5f2c" />
+
 
 
 ## Features
