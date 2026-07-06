@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Exe name is ThinkPadToolbox.exe. RootNamespace stays LEDControl so embedded
+         resource names (e.g. LEDControl.Resources.LpcACPIEC.bin) referenced by string
+         in code keep resolving. -->
+    <RootNamespace>LEDControl</RootNamespace>
+    <AssemblyName>ThinkPadToolbox</AssemblyName>
+    <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>AnyCPU</Platforms>
+    <!-- Windows-only ThinkPad utility: silence the platform-compat analyzer. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <!-- Keep the hand-authored Properties\AssemblyInfo.cs -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <!-- Dead code left over from the removed disk-warning dialog / embedded-assembly loader. -->
+  <ItemGroup>
+    <Compile Remove="MsgBoxCheck.cs" />
+    <Compile Remove="EmbeddedAssembly.cs" />
+  </ItemGroup>
+
+  <!-- Legacy managed helper assemblies (still used: CoreAudioApi for mic mute, WindowsAPICodePack for PowerManager). -->
+  <ItemGroup>
+    <Reference Include="Microsoft.WindowsAPICodePack">
+      <HintPath>Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- WMI access for battery health / cycle count. -->
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Compiled PawnIO EC module (loaded into the signed PawnIO driver at runtime). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\LpcACPIEC.bin" />
+  </ItemGroup>
+
+  <!-- WinRing0 kernel driver + native access DLLs must sit next to the exe. -->
+  <ItemGroup>
+    <Content Include="WinRing0.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WinRing0.sys">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WinRing0.vxd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WinRing0x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WinRing0x64.sys">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
