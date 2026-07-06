@@ -37,10 +37,6 @@ namespace LEDControl
             this.sleepOn = new System.Windows.Forms.Button();
             this.sleepOff = new System.Windows.Forms.Button();
             this.sleepBlink = new System.Windows.Forms.Button();
-            this.label14 = new System.Windows.Forms.Label();
-            this.button11 = new System.Windows.Forms.Button();
-            this.button10 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
             // Fan
             this.gbFan = new System.Windows.Forms.GroupBox();
             this.fanAuto = new System.Windows.Forms.Button();
@@ -97,13 +93,9 @@ namespace LEDControl
             this.gbLeds.Controls.Add(this.sleepOn);
             this.gbLeds.Controls.Add(this.sleepOff);
             this.gbLeds.Controls.Add(this.sleepBlink);
-            this.gbLeds.Controls.Add(this.label14);
-            this.gbLeds.Controls.Add(this.button11);
-            this.gbLeds.Controls.Add(this.button10);
-            this.gbLeds.Controls.Add(this.button9);
             this.gbLeds.Location = new System.Drawing.Point(12, 6);
             this.gbLeds.Name = "gbLeds";
-            this.gbLeds.Size = new System.Drawing.Size(436, 200);
+            this.gbLeds.Size = new System.Drawing.Size(436, 164);
             this.gbLeds.TabIndex = 0;
             this.gbLeds.TabStop = false;
             this.gbLeds.Text = "LEDs";
@@ -248,46 +240,11 @@ namespace LEDControl
             this.sleepBlink.UseVisualStyleBackColor = true;
             this.sleepBlink.Click += new System.EventHandler(this.sleepBlink_Click);
             //
-            // label14
-            //
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(10, 170);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(62, 17);
-            this.label14.Text = "Fn Lock:";
-            //
-            // button11
-            //
-            this.button11.Location = new System.Drawing.Point(112, 164);
-            this.button11.Size = new System.Drawing.Size(100, 28);
-            this.button11.TabIndex = 13;
-            this.button11.Text = "ON";
-            this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(this.button11_Click);
-            //
-            // button10
-            //
-            this.button10.Location = new System.Drawing.Point(218, 164);
-            this.button10.Size = new System.Drawing.Size(100, 28);
-            this.button10.TabIndex = 14;
-            this.button10.Text = "OFF";
-            this.button10.UseVisualStyleBackColor = true;
-            this.button10.Click += new System.EventHandler(this.button10_Click);
-            //
-            // button9
-            //
-            this.button9.Location = new System.Drawing.Point(324, 164);
-            this.button9.Size = new System.Drawing.Size(100, 28);
-            this.button9.TabIndex = 15;
-            this.button9.Text = "Third state";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
-            //
             // gbFan
             //
             this.gbFan.Controls.Add(this.fanAuto);
             this.gbFan.Controls.Add(this.fanFull);
-            this.gbFan.Location = new System.Drawing.Point(12, 214);
+            this.gbFan.Location = new System.Drawing.Point(12, 178);
             this.gbFan.Name = "gbFan";
             this.gbFan.Size = new System.Drawing.Size(436, 58);
             this.gbFan.TabIndex = 16;
@@ -317,7 +274,7 @@ namespace LEDControl
             this.gbKeyboard.Controls.Add(this.kbOff);
             this.gbKeyboard.Controls.Add(this.kbLow);
             this.gbKeyboard.Controls.Add(this.kbHigh);
-            this.gbKeyboard.Location = new System.Drawing.Point(12, 280);
+            this.gbKeyboard.Location = new System.Drawing.Point(12, 244);
             this.gbKeyboard.Name = "gbKeyboard";
             this.gbKeyboard.Size = new System.Drawing.Size(436, 58);
             this.gbKeyboard.TabIndex = 19;
@@ -355,7 +312,7 @@ namespace LEDControl
             //
             this.gbStatus.Controls.Add(this.lblSensors);
             this.gbStatus.Controls.Add(this.lblBattery);
-            this.gbStatus.Location = new System.Drawing.Point(12, 346);
+            this.gbStatus.Location = new System.Drawing.Point(12, 310);
             this.gbStatus.Name = "gbStatus";
             this.gbStatus.Size = new System.Drawing.Size(436, 62);
             this.gbStatus.TabIndex = 23;
@@ -382,7 +339,7 @@ namespace LEDControl
             //
             this.gbOptions.Controls.Add(this.rememberKBD);
             this.gbOptions.Controls.Add(this.checkTurnKBLightOff);
-            this.gbOptions.Location = new System.Drawing.Point(12, 416);
+            this.gbOptions.Location = new System.Drawing.Point(12, 380);
             this.gbOptions.Name = "gbOptions";
             this.gbOptions.Size = new System.Drawing.Size(436, 92);
             this.gbOptions.TabIndex = 24;
@@ -409,7 +366,7 @@ namespace LEDControl
             //
             // button1
             //
-            this.button1.Location = new System.Drawing.Point(12, 516);
+            this.button1.Location = new System.Drawing.Point(12, 480);
             this.button1.Size = new System.Drawing.Size(100, 28);
             this.button1.TabIndex = 27;
             this.button1.Text = "About";
@@ -418,7 +375,7 @@ namespace LEDControl
             //
             // button4
             //
-            this.button4.Location = new System.Drawing.Point(119, 516);
+            this.button4.Location = new System.Drawing.Point(119, 480);
             this.button4.Size = new System.Drawing.Size(329, 28);
             this.button4.TabIndex = 28;
             this.button4.Text = "Register to run at system startup as admin";
@@ -427,7 +384,7 @@ namespace LEDControl
             //
             // button12
             //
-            this.button12.Location = new System.Drawing.Point(12, 553);
+            this.button12.Location = new System.Drawing.Point(12, 517);
             this.button12.Size = new System.Drawing.Size(436, 28);
             this.button12.TabIndex = 29;
             this.button12.Text = "Choose driver";
@@ -498,9 +455,6 @@ namespace LEDControl
             this.toolTip1.SetToolTip(this.sleepOn, "Turn the sleep (moon) LED on");
             this.toolTip1.SetToolTip(this.sleepOff, "Turn the sleep (moon) LED off");
             this.toolTip1.SetToolTip(this.sleepBlink, "Blink the sleep (moon) LED (third state)");
-            this.toolTip1.SetToolTip(this.button11, "Turn the Fn-lock LED on");
-            this.toolTip1.SetToolTip(this.button10, "Turn the Fn-lock LED off");
-            this.toolTip1.SetToolTip(this.button9, "Blink the Fn-lock LED (third state)");
             this.toolTip1.SetToolTip(this.fanAuto, "Let the firmware control the fan automatically (normal)");
             this.toolTip1.SetToolTip(this.fanFull, "Run the fan at full speed for maximum cooling");
             this.toolTip1.SetToolTip(this.kbOff, "Turn the keyboard backlight off");
@@ -514,7 +468,7 @@ namespace LEDControl
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(460, 591);
+            this.ClientSize = new System.Drawing.Size(460, 555);
             this.Controls.Add(this.gbLeds);
             this.Controls.Add(this.gbFan);
             this.Controls.Add(this.gbKeyboard);
@@ -560,10 +514,6 @@ namespace LEDControl
         private System.Windows.Forms.Button sleepOn;
         private System.Windows.Forms.Button sleepOff;
         private System.Windows.Forms.Button sleepBlink;
-        private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Button button11;
-        private System.Windows.Forms.Button button10;
-        private System.Windows.Forms.Button button9;
         private System.Windows.Forms.GroupBox gbFan;
         private System.Windows.Forms.Button fanAuto;
         private System.Windows.Forms.Button fanFull;

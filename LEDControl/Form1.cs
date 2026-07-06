@@ -650,20 +650,6 @@ namespace LEDControl
             if (!LED(LEDs.Sleep, PowerStates.Blink)) MessageBox.Show(error_text_buttons, "ThinkPad Toolbox", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void button11_Click(object sender, EventArgs e)
-        {
-            if (!LED(LEDs.Fn, PowerStates.On)) MessageBox.Show(error_text_buttons, "ThinkPad Toolbox", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-            if (!LED(LEDs.Fn, PowerStates.Off)) MessageBox.Show(error_text_buttons, "ThinkPad Toolbox", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        private void button9_Click(object sender, EventArgs e)
-        {
-            if (!LED(LEDs.Fn, PowerStates.Blink)) MessageBox.Show(error_text_buttons, "ThinkPad Toolbox", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
         #endregion
 
         #region Fan
