@@ -15,6 +15,21 @@ and battery information, all from one tray app.
 > "Lenovo" and "ThinkPad" are trademarks of Lenovo.
 <img width="419" height="485" alt="image" src="https://github.com/user-attachments/assets/51e27529-045f-4ca9-846f-8a84de5e5f2c" />
 
+## Why this exists
+
+It started with one small LED I couldn't turn off. Subtle enough to ignore, persistent
+enough to annoy. Hunting for a fix, I found ValiNet's excellent
+[ThinkPad LED Control](https://github.com/valinet/ThinkPadLEDControl), and it did the job
+beautifully.
+
+Then Windows 11 kept tightening its driver rules. Memory Integrity now blocks the old
+WinRing0 driver outright, and I didn't want a tool I rely on to quietly stop working one
+update later. So I modernized it: rebuilt on .NET 8, added the signed PawnIO driver so it
+runs on locked-down Windows 11, and folded in the things I'd always wished it had: fan
+control, keyboard backlight, and live temperature, fan, and battery readouts.
+
+ThinkPad Toolbox is that tool.
+
 
 
 ## Features
