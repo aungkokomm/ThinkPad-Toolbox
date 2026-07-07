@@ -926,7 +926,10 @@ namespace LEDControl
                 Process pr = new Process();
                 ProcessStartInfo pi = new ProcessStartInfo();
                 pi.FileName = "cmd.exe";
-                pi.Arguments = "/c schtasks /create /tn \"Start ThinkPad Toolbox elevated\" /xml \"" + Application.StartupPath + "\\apply.xml\"";
+                // Same task name as the installer's "start at logon" option, with /f to
+                // overwrite, so the two never create parallel startup tasks (which is how
+                // multiple copies once launched at login).
+                pi.Arguments = "/c schtasks /create /f /tn \"ThinkPad Toolbox\" /xml \"" + Application.StartupPath + "\\apply.xml\"";
                 pr.StartInfo = pi;
                 pr.Start();
                 pr.WaitForExit();
