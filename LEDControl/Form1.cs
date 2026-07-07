@@ -371,6 +371,15 @@ namespace LEDControl
         bool hide_me = false;
         int fanMode = 0;            // 0 = auto (firmware), 1 = full
 
+        // Single-instance guard.
+        static System.Threading.Mutex instanceMutex;
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern int RegisterWindowMessage(string message);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+        static readonly int WM_SHOWTPTOOLBOX = RegisterWindowMessage("WM_SHOW_ThinkPadToolbox_5F3A");
+        const int HWND_BROADCAST = 0xffff;
+
         public static bool IsAdministrator()
         {
             return (new WindowsPrincipal(WindowsIdentity.GetCurrent()))
@@ -475,6 +484,17 @@ namespace LEDControl
                         Environment.Exit(0);
                     }
                 }
+            }
+
+            // Single instance: only one running copy at a time. Multiple copies would each
+            // poll and drive the embedded controller, multiplying the risk of colliding with
+            // Windows. If a copy is already running, ask it to show its window and quit this one.
+            bool createdNew;
+            instanceMutex = new System.Threading.Mutex(true, "ThinkPadToolbox_SingleInstance_5F3A", out createdNew);
+            if (!createdNew)
+            {
+                if (WM_SHOWTPTOOLBOX != 0) PostMessage((IntPtr)HWND_BROADCAST, WM_SHOWTPTOOLBOX, IntPtr.Zero, IntPtr.Zero);
+                Environment.Exit(0);
             }
 
             if (Properties.Settings.Default.Driver == 0)
@@ -1188,6 +1208,19 @@ namespace LEDControl
 
         protected override void WndProc(ref Message m)
         {
+            // A second copy asked us to come to the front (single-instance handoff).
+            if (WM_SHOWTPTOOLBOX != 0 && m.Msg == WM_SHOWTPTOOLBOX)
+            {
+                DoOnUIThread(delegate ()
+                {
+                    this.Show();
+                    this.WindowState = FormWindowState.Normal;
+                    this.Activate();
+                    this.BringToFront();
+                });
+                return;
+            }
+
             bool handled = false;
             switch (m.Msg)
             {
