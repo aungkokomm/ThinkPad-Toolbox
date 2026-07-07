@@ -46,6 +46,18 @@ ThinkPad Toolbox is that tool.
 - A ThinkPad (LED/fan/keyboard control talk to the embedded controller and are model dependent)
 - Administrator rights (required by the hardware driver; the app elevates itself)
 
+## Compatibility
+
+Developed and tested on a **ThinkPad E14 running Windows 11 25H2**, where everything works well.
+
+This tool talks directly to the ThinkPad embedded controller, and that layout differs
+between models and generations. On other ThinkPads some or all controls may do nothing,
+read the wrong values, or behave unexpectedly. **Use at your own risk.** If anything looks
+off (battery, charging, or thermals), quit the app and reboot; that resets the controller.
+
+If it works on your model, opening an issue with your model number helps build a
+known-compatible list.
+
 ## Download
 
 Grab the latest installer from the [Releases](../../releases) page and run it. It is
