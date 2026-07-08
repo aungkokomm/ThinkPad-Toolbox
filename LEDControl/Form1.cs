@@ -252,6 +252,12 @@ namespace LEDControl
         {
             On, Off, Blink
         }
+
+        // Remember the last state the user set for each named LED, so we can re-apply it after
+        // Windows/firmware resets the status LEDs on lock/unlock or sleep/resume.
+        readonly object ledDesiredLock = new object();
+        readonly Dictionary<LEDs, PowerStates> ledDesired = new Dictionary<LEDs, PowerStates>();
+
         bool LED(LEDs which, PowerStates what, bool mayOverride = true)
         {
             byte led = 0xFF;
@@ -286,6 +292,7 @@ namespace LEDControl
                     power = 0xC0;
                     break;
             }
+            lock (ledDesiredLock) { ledDesired[which] = what; }
             byte _out = (byte)(led | power);
             return WriteByteToEC(TP_LED_OFFSET, _out);
         }
@@ -307,6 +314,35 @@ namespace LEDControl
             }
             byte _out = (byte)(led | power);
             return WriteByteToEC(TP_LED_OFFSET, _out);
+        }
+
+        // Re-apply the LED states the user chose. The ThinkPad firmware resets the status LEDs
+        // to its own defaults on lock/unlock and sleep/resume, so we restore the user's choice
+        // afterwards. EC writes are guarded (mutex + timeout); if the EC is busy the write just
+        // aborts, so this cannot corrupt anything.
+        void ReapplyLeds()
+        {
+            KeyValuePair<LEDs, PowerStates>[] snapshot;
+            lock (ledDesiredLock)
+            {
+                if (ledDesired.Count == 0) return;
+                snapshot = ledDesired.ToArray();
+            }
+            foreach (var kv in snapshot)
+            {
+                try { LED(kv.Key, kv.Value); } catch { }
+            }
+        }
+
+        // Fires an immediate re-apply plus one a beat later, because the firmware can set the
+        // LEDs just after the unlock/resume event and we want to win that race.
+        void ReapplyLedsAfterWake()
+        {
+            ReapplyLeds();
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                try { await System.Threading.Tasks.Task.Delay(1200); ReapplyLeds(); } catch { }
+            });
         }
         #endregion
 
@@ -390,6 +426,7 @@ namespace LEDControl
             InitializeComponent();
             this.Icon = LEDControl.Properties.Resources.AppIcon;
             SystemEvents.PowerModeChanged += OnPowerChange;
+            SystemEvents.SessionSwitch += OnSessionSwitch;
         }
 
         protected override void OnSizeChanged(EventArgs e)
@@ -967,7 +1004,20 @@ namespace LEDControl
                         SetKeyboardLevel(MostCommonLevel());
                         lightTimer.Enabled = true;
                     }
+                    ReapplyLedsAfterWake();
                     break;
+            }
+        }
+
+        // The firmware resets the status LEDs when the session locks/unlocks; restore the
+        // user's chosen LED states after every unlock, sign-in, or fast-user-switch reconnect.
+        void OnSessionSwitch(object sender, SessionSwitchEventArgs e)
+        {
+            if (e.Reason == SessionSwitchReason.SessionUnlock ||
+                e.Reason == SessionSwitchReason.SessionLogon ||
+                e.Reason == SessionSwitchReason.ConsoleConnect)
+            {
+                ReapplyLedsAfterWake();
             }
         }
 
