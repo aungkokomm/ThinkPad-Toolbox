@@ -666,12 +666,14 @@ namespace LEDControl
 
             RegisterForPowerNotifications();
 
+            RegisterShowHotkey();
+
             ReadSettingsKBD();
 
             if (rememberKBD.Checked) lightTimer.Enabled = true;
 
             NotifyIcon1.Icon = LEDControl.Properties.Resources.AppIcon;
-            NotifyIcon1.Text = "ThinkPad Toolbox";
+            NotifyIcon1.Text = "ThinkPad Toolbox (Win+Shift+L to open)";
 
             StartStatusReadout();
             RefreshFanHighlight();
@@ -892,6 +894,7 @@ namespace LEDControl
         }
         void wrapup()
         {
+            UnregisterShowHotkey();
             SaveSettings();
             SaveSettingsKBD();
             if (fanMode != 0) WriteByteToEC(TP_ECOFFSET_FAN, FAN_AUTO); // restore firmware fan control on exit
@@ -1259,18 +1262,55 @@ namespace LEDControl
             Debug.WriteLine(hLIDSWITCHSTATECHANGE.ToString());
         }
 
+        // Global hotkey (Win+Shift+L) to summon the window from the tray. Win+L itself is
+        // reserved by Windows (lock), but the Shift variant is free to register.
+        [DllImport("user32.dll")] static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        [DllImport("user32.dll")] static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        const int WM_HOTKEY = 0x0312;
+        const int HOTKEY_ID_SHOW = 0xB001;
+        const uint MOD_SHIFT = 0x0004, MOD_WIN = 0x0008, MOD_NOREPEAT = 0x4000;
+        const uint VK_L = 0x4C;
+        bool hotkeyRegistered = false;
+
+        void RegisterShowHotkey()
+        {
+            try { hotkeyRegistered = RegisterHotKey(this.Handle, HOTKEY_ID_SHOW, MOD_WIN | MOD_SHIFT | MOD_NOREPEAT, VK_L); }
+            catch { hotkeyRegistered = false; }
+        }
+
+        void UnregisterShowHotkey()
+        {
+            if (!hotkeyRegistered) return;
+            try { UnregisterHotKey(this.Handle, HOTKEY_ID_SHOW); } catch { }
+            hotkeyRegistered = false;
+        }
+
+        // Bring the window back from the tray, centered and focused.
+        void ShowFromTray()
+        {
+            DoOnUIThread(delegate ()
+            {
+                this.Show();
+                this.WindowState = FormWindowState.Normal;
+                this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Width / 2 - this.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - this.Height / 2);
+                this.Activate();
+                this.BringToFront();
+            });
+        }
+
         protected override void WndProc(ref Message m)
         {
             // A second copy asked us to come to the front (single-instance handoff).
             if (WM_SHOWTPTOOLBOX != 0 && m.Msg == WM_SHOWTPTOOLBOX)
             {
-                DoOnUIThread(delegate ()
-                {
-                    this.Show();
-                    this.WindowState = FormWindowState.Normal;
-                    this.Activate();
-                    this.BringToFront();
-                });
+                ShowFromTray();
+                return;
+            }
+
+            // Global hotkey (Win+Shift+L) pressed.
+            if (m.Msg == WM_HOTKEY && (int)m.WParam == HOTKEY_ID_SHOW)
+            {
+                ShowFromTray();
                 return;
             }
 
