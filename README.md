@@ -38,7 +38,7 @@ ThinkPad Toolbox is that tool.
 - **CPU fan**: switch between firmware **Auto** and **Full** speed.
 - **Keyboard backlight**: Off / Low / High, with options to remember the level across sleep/restart and to dim it when apps go full screen.
 - **System status**: live CPU temperature (color coded), fan RPM, and battery charge / health / cycle count.
-- Lives in the system tray; optional start at Windows logon.
+- Lives in the system tray; optional start at Windows logon.(**Win+Shift+L** global hotkey to summon the window from the tray)
 
 ## Requirements
 
