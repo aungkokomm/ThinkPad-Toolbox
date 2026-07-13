@@ -292,7 +292,13 @@ namespace LEDControl
                     power = 0xC0;
                     break;
             }
-            lock (ledDesiredLock) { ledDesired[which] = what; }
+            bool ledChanged;
+            lock (ledDesiredLock)
+            {
+                ledChanged = !ledDesired.TryGetValue(which, out PowerStates existing) || existing != what;
+                ledDesired[which] = what;
+            }
+            if (ledChanged) SaveLedStates();
             byte _out = (byte)(led | power);
             return WriteByteToEC(TP_LED_OFFSET, _out);
         }
@@ -343,6 +349,40 @@ namespace LEDControl
             {
                 try { await System.Threading.Tasks.Task.Delay(1200); ReapplyLeds(); } catch { }
             });
+        }
+
+        // Persist the chosen LED states so they survive a reboot and re-apply at the next logon.
+        void SaveLedStates()
+        {
+            string s;
+            lock (ledDesiredLock)
+            {
+                var parts = new List<string>();
+                foreach (var kv in ledDesired) parts.Add(kv.Key + "=" + kv.Value);
+                s = string.Join(",", parts);
+            }
+            try { Properties.Settings.Default.LedStates = s; Properties.Settings.Default.Save(); } catch { }
+        }
+
+        void LoadLedStates()
+        {
+            string s = "";
+            try { s = Properties.Settings.Default.LedStates ?? ""; } catch { }
+            if (string.IsNullOrEmpty(s)) return;
+            lock (ledDesiredLock)
+            {
+                ledDesired.Clear();
+                foreach (string part in s.Split(','))
+                {
+                    string[] kv = part.Split('=');
+                    if (kv.Length == 2 &&
+                        Enum.TryParse(kv[0], out LEDs led) &&
+                        Enum.TryParse(kv[1], out PowerStates st))
+                    {
+                        ledDesired[led] = st;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -457,6 +497,19 @@ namespace LEDControl
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            // Carry user settings (LED states, driver, keyboard prefs) forward when the app
+            // updates to a new version; .NET otherwise starts each version with a fresh store.
+            if (Properties.Settings.Default.UpgradeRequired)
+            {
+                try
+                {
+                    Properties.Settings.Default.Upgrade();
+                    Properties.Settings.Default.UpgradeRequired = false;
+                    Properties.Settings.Default.Save();
+                }
+                catch { }
+            }
 
             string[] cmd = Environment.GetCommandLineArgs();
             string prev = "";
@@ -671,6 +724,10 @@ namespace LEDControl
             ReadSettingsKBD();
 
             if (rememberKBD.Checked) lightTimer.Enabled = true;
+
+            // Restore the LED states the user chose in a previous session.
+            LoadLedStates();
+            ReapplyLedsAfterWake();
 
             NotifyIcon1.Icon = LEDControl.Properties.Resources.AppIcon;
             NotifyIcon1.Text = "ThinkPad Toolbox (Win+Shift+L to open)";

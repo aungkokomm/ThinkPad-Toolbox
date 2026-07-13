@@ -30,7 +30,7 @@ namespace LEDControl
                 Padding = new Padding(16, 14, 16, 8)
             };
 
-            panel.Controls.Add(TitleLabel("ThinkPad Toolbox 1.0.5"));
+            panel.Controls.Add(TitleLabel("ThinkPad Toolbox 1.0.6"));
             panel.Controls.Add(Para("Copyright © 2026 Aung Ko Ko  ·  MIT License"));
             panel.Controls.Add(Gap(6));
             panel.Controls.Add(LinkRow("Project page", "https://github.com/aungkokomm/ThinkPad-Toolbox"));

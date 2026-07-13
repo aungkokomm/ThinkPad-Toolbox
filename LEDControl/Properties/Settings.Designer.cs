@@ -442,5 +442,17 @@ namespace LEDControl.Properties {
                 this["DiskWarning"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LedStates {
+            get {
+                return ((string)(this["LedStates"]));
+            }
+            set {
+                this["LedStates"] = value;
+            }
+        }
     }
 }
