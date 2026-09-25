@@ -3,10 +3,10 @@
 ; with an optional "run at Windows logon (as administrator)" scheduled task.
 
 #define AppName "ThinkPad Toolbox"
-#define AppVersion "1.0.6"
+#define AppVersion "1.1.0"
 #define AppExe "ThinkPadToolbox.exe"
 #define AppPublisher "Independent (unofficial - not affiliated with Lenovo)"
-#define PublishDir "..\publish\v1.0.6"
+#define PublishDir "..\publish\v1.1.0"
 #define IconFile "..\LEDControl\Resources\AppIcon.ico"
 
 [Setup]
