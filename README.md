@@ -103,3 +103,7 @@ driver.
 - [ThinkPad LED Control](https://github.com/valinet/ThinkPadLEDControl) by ValiNet, the project this is based on
 - TPFanControl, for the embedded-controller access approach
 - [PawnIO](https://pawnio.eu) by namazso, the modern signed driver
+
+---
+
+<p align="center"><sub>© 2026 Aung Ko Ko · <a href="https://aungkokomm.github.io/">more of my apps</a></sub></p>
